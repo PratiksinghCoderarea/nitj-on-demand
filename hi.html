@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        // Create Chat Session API and query the session
+// Function to create a chat session
+function createChatSession() {
+    return fetch('https://gateway-dev.on-demand.io/chat/v1/sessions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'jqs84CMtfegxFJ5KymzaAUH5UVsz6E1H'  // Replace with your actual API key
+        },
+        body: JSON.stringify({ 
+            "pluginIds": [], 
+            "externalUserId": "1" 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.chatSession && data.chatSession.id) {
+            return data.chatSession.id; // Return session ID
+        } else {
+            throw new Error('Invalid response structure');
+        }
+    })
+    .catch(error => {
+        console.error('Error creating chat session:', error);
+        throw error; // Propagate error
+    });
+}
+
+// Function to query the chat session
+function queryChatSession(sessionId, query) {
+    return fetch(`https://gateway-dev.on-demand.io/chat/v1/sessions/${sessionId}/query`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'apikey': 'jqs84CMtfegxFJ5KymzaAUH5UVsz6E1H'  // Ensure this is the correct API key for the second request
+        },
+        body: JSON.stringify({ 
+            "endpointId": "predefined-openai-gpt4o", 
+            "query": "tour from jaipur to jodhpur",  // Replace with your actual query
+            "pluginIds": ["plugin-1717459265", "plugin-1717455118", "plugin-1717458428"], 
+            "responseMode": "sync" 
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data) {
+            console.log('Query Response:', data);  // Handle response data here
+            return data;
+        } else {
+            throw new Error('Invalid response structure');
+        }
+    })
+    .catch(error => {
+        console.error('Error querying chat session:', error);
+        throw error; // Propagate error
+    });
+}
+
+// Main function to create a session and query it
+function main() {
+    createChatSession()
+        .then(sessionId => {
+            console.log('Chat Session ID:', sessionId);
+            return queryChatSession(sessionId, 'Put your query here'); // Replace with your actual query
+        })
+        .then(queryResponse => {
+            const answer = queryResponse.chatMessage.answer;
+        console.log('Answer:', answer); 
+        })
+        .catch(error => {
+            console.error('Error in main flow:', error);
+        });
+}
+
+// Run the main function
+main();
+
+
+    </script>
+</body>
+</html>
